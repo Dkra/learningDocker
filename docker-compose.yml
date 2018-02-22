@@ -1,8 +1,17 @@
 version: '3'
 services:
-  web:
+  api:
     build: .
     ports:
       - "4000:3000"
     volumes:
       - .:/usr/src/app
+    environment:
+      mongoUri: "mongodb://database/learningDocker"
+    links:
+      - database:learningDocker
+
+  database:
+    image: mongo
+    ports:
+      - "4001:27017"

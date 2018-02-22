@@ -1,10 +1,42 @@
 const Koa = require('koa2')
+const bodyParser = require('koa-bodyparser')
+const Router = require('koa-router')
+const mongoose = require('mongoose')
+const logger = require('koa-logger')
+const json = require('koa-json')
+const User = require('./models/user')
+
+const mongoUri =
+	process.env.mongoUri || 'mongodb://localhost:27017/local-dev-db'
+mongoose.connect(mongoUri)
 
 const app = new Koa()
+const router = new Router()
 
-app.use(async function(ctx) {
-  ctx.body =
-    'Docker volumes can make the data persist util the container stopped!!!!!'
+router.get('/users', async ctx => {
+	await User.find({}, (err, users) => {
+		console.log('err:', err)
+		ctx.response.body = users
+	})
+})
+
+router.post('/users', async ctx => {
+	const newUser = new User(ctx.request.body)
+
+	await newUser.save((err, user) => {
+		console.log('user:', user)
+	})
+
+	ctx.response.body = newUser
+})
+
+app.use(logger())
+app.use(json())
+app.use(bodyParser())
+app.use(router.routes()).use(router.allowedMethods())
+
+app.on('error', err => {
+	err ? console.log('server error', err) : null
 })
 
 app.listen(3000)
