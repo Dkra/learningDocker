@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const logger = require('koa-logger')
 const json = require('koa-json')
 const User = require('./models/user')
+const axios = require('axios')
 
 const mongoUri =
 	process.env.mongoUri || 'mongodb://localhost:27017/local-dev-db'
@@ -24,7 +25,17 @@ router.post('/users', async ctx => {
 	const newUser = new User(ctx.request.body)
 
 	await newUser.save((err, user) => {
-		console.log('user:', user)
+		if (err) console.log('err:', err)
+		else {
+			axios
+				.get('http://notifications:7777/notify')
+				.then(function(response) {
+					console.log(response)
+				})
+				.catch(function(error) {
+					console.log(error)
+				})
+		}
 	})
 
 	ctx.response.body = newUser

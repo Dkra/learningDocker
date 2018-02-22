@@ -7,11 +7,19 @@ services:
     volumes:
       - .:/usr/src/app
     environment:
-      mongoUri: "mongodb://database/learningDocker"
+      mongoUri: "mongodb://mydb/learningDocker"
     links:
-      - database:learningDocker
+      - database:mydb # serviceName:serviceNameAlias
+      - notifications
 
   database:
     image: mongo
     ports:
       - "4001:27017"
+
+  notifications:
+    build: ./notification-service
+    ports: 
+      - "4002:7777" # host port:container export port
+    environment:
+      port: "7777" # specify express server listen port set to 7777 in server.js file 
