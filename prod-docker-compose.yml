@@ -1,0 +1,25 @@
+version: '3'
+services:
+  api:
+    # build: .
+    image: dkra4741/learningdocker # image on docker hub
+    ports:
+      - "80:3000"
+    links:
+      - database:mydb # serviceName:serviceNameAlias
+      - notifications
+    # env_file: .env  # for security issue should put in .env file
+    environment:
+      mongoUri: "mongodb://mydb/learningDocker"
+
+  database:
+    image: mongo
+    ports:
+      - "4001:27017"
+
+  notifications:
+    image: dkra4741/notifications
+    ports: 
+      - "4002:7777" # host port:container export port
+    environment:
+      port: "7777" # specify express server listen port set to 7777 in server.js file 
